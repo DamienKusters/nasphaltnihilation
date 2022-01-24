@@ -12,7 +12,14 @@ var currentSpeed = 0;
 onready var uiHand = $"Camera/ui/speedometer/speedometerlever";
 var currentHandRotation = -122;
 
+onready var uiPlayerSprite = $"Camera/ui/sprite_player";
+onready var sprPlayer = load("res://assets/sprites/motor_rear.png");
+onready var sprPlayerSide = load("res://assets/sprites/motor_side.png");
+
+onready var rigid = $"..";
+
 func _process(delta):
+	
 	if !(currentSpeed >= maxSpeed):
 		if Input.is_action_pressed("ui_up"):
 			currentSpeed = currentSpeed + (throttleUp - drag) * delta;
@@ -20,13 +27,21 @@ func _process(delta):
 		if Input.is_action_pressed("ui_down"):
 			currentSpeed = currentSpeed - throttleDown * delta;
 	if Input.is_action_pressed("ui_left"):
-		pass
-	if Input.is_action_pressed("ui_right"):
-		pass
+		uiPlayerSprite.flip_h = false;
+		uiPlayerSprite.texture = sprPlayerSide;
+		rigid.add_force(Vector3(-10,0,0),Vector3(0,0,0));
+	elif Input.is_action_pressed("ui_right"):
+		uiPlayerSprite.flip_h = true;
+		uiPlayerSprite.texture = sprPlayerSide;
+		rigid.add_force(Vector3(10,0,0),Vector3(0,0,0));
+	else:
+		uiPlayerSprite.texture = sprPlayer;
 	if !(currentSpeed <= 0):
 		currentSpeed = currentSpeed - drag * delta;
 	print(currentSpeed);
 	updateUi();
+	var newSpeed = currentSpeed / 5;
+	rigid.add_force(Vector3(0,0,newSpeed - newSpeed - newSpeed),Vector3(0,0,0));
 
 
 func updateUi():
